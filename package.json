@@ -1,0 +1,17 @@
+{
+  "name": "diffsonjs",
+  "version": "1.0.0",
+  "description": "RFC-6902 implementation",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "json"
+  ],
+  "author": "henoc",
+  "license": "MIT",
+  "dependencies": {
+    "fast-deep-equal": "^2.0.1"
+  }
+}
