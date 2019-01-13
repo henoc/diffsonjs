@@ -4,14 +4,22 @@
   "description": "RFC-6902 implementation",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "tsc -p ./",
+    "test": "mocha",
+    "coverage": "nyc mocha --timeout=3000"
   },
   "keywords": [
-    "json"
+    "json",
+    "diff",
+    "patch"
   ],
   "author": "henoc",
   "license": "MIT",
-  "dependencies": {
-    "fast-deep-equal": "^2.0.1"
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.5",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "nyc": "^13.1.0"
   }
 }
