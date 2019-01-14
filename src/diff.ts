@@ -1,23 +1,32 @@
-import { pointerAdd } from "./jsonpointer";
+import phelper from "./json-pointer-helper";
 import { IndexPair, getLcs } from "./lcs";
 import { jsonEquals } from "./deepequal";
 
 export type DiffOperator = {
-    pointer: string
+    path: string
 } & ({
-    operator: "replace"
+    op: "replace"
     value: any
     oldValue?: any
 } | {
-    operator: "remove"
+    op: "remove"
     oldValue?: any
 } | {
-    operator: "add"
+    op: "add"
     value: any
-})
+} | {
+    op: "move"
+    from: string
+} | {
+    op: "copy"
+    from: string
+} | {
+    op: "test"
+    value: any
+});
 
 export interface DiffOptions {
-    arrayDiffs?: boolean
+    omitArrayDiffs?: boolean
     remember?: boolean
     equals?: (left: unknown, right: unknown) => boolean
     hashCode?: (value: any) => number
@@ -29,10 +38,6 @@ function isObject(e: unknown): e is IdxObject {
     return typeof e === "object" && e !== null && !Array.isArray(e);
 }
 
-function undefinedIsTrue(value: boolean | undefined): boolean {
-    return value === undefined ? true : value;
-}
-
 export function diff(left: unknown, right: unknown, options: DiffOptions = {}): DiffOperator[] {
     return anyDiff(left, right, "", options);
 }
@@ -41,8 +46,8 @@ function anyDiff(left: unknown, right: unknown, pointer: string, options: DiffOp
     const equals = options.equals || jsonEquals;
     if (equals(left, right)) return [];
     else if (isObject(left) && isObject(right)) return fieldsDiff(left, right, pointer, options);
-    else if (Array.isArray(left) && Array.isArray(right) && undefinedIsTrue(options.arrayDiffs)) return arraysDiff(left, right, pointer, options);
-    else return [{operator: "replace", pointer, value: right, ...(options.remember ? {oldValue: left} : {})}];
+    else if (Array.isArray(left) && Array.isArray(right) && !options.omitArrayDiffs) return arraysDiff(left, right, pointer, options);
+    else return [{op: "replace", path: pointer, value: right, ...(options.remember ? {oldValue: left} : {})}];
 }
 
 function fieldsDiff(left: IdxObject, right: IdxObject, pointer: string, options: DiffOptions): DiffOperator[] {
@@ -52,11 +57,11 @@ function fieldsDiff(left: IdxObject, right: IdxObject, pointer: string, options:
     allKeys.sort();
     for (const key of allKeys) {
         if (key in left && key in right && !equals(left[key], right[key])) {
-            ret.push(...anyDiff(left[key], right[key], pointerAdd(pointer, key), options));
+            ret.push(...anyDiff(left[key], right[key], phelper.append(pointer, key), options));
         } else if (key in left && !(key in right)) {
-            ret.push({operator: "remove", pointer: pointerAdd(pointer, key), ...(options.remember ? {oldValue: left[key]} : {})});
+            ret.push({op: "remove", path: phelper.append(pointer, key), ...(options.remember ? {oldValue: left[key]} : {})});
         } else if (!(key in left) && key in right) {
-            ret.push({operator: "add", pointer: pointerAdd(pointer, key), value: right[key]});
+            ret.push({op: "add", path: phelper.append(pointer, key), value: right[key]});
         }
     }
     return ret;
@@ -83,13 +88,13 @@ function arraysDiff(left: unknown[], right: unknown[], pointer: string, options:
             leftIndex = nextCs.leftIndex;
             csIndex++;
         } else if (left.length > leftIndex && right.length > rightIndex) {
-            ret.push(...anyDiff(left[leftIndex], right[rightIndex], pointerAdd(pointer, String(leftIndex + leftShift)), options));
+            ret.push(...anyDiff(left[leftIndex], right[rightIndex], phelper.append(pointer, String(leftIndex + leftShift)), options));
         } else if (right.length <= rightIndex) {
             ret.push(...removeAll(left, pointer, leftIndex, left.length, leftShift, options.remember || false));
             break;
         } else {
             ret.push(...right.slice(rightIndex).map(value => {
-                return {operator: <"add">"add", pointer: pointerAdd(pointer, "-"), value};
+                return {op: <"add">"add", path: phelper.append(pointer, "-"), value};
             }));
             break;
         }
@@ -103,8 +108,8 @@ function addAll(array: unknown[], pointer: string, beginIndex: number, endIndex:
     const ret: DiffOperator[] = [];
     for (let i = beginIndex; i < endIndex; i++) {
         ret.push({
-            operator: "add",
-            pointer: pointerAdd(pointer, String(i)),
+            op: "add",
+            path: phelper.append(pointer, String(i)),
             value: array[i]
         });
     }
@@ -115,8 +120,8 @@ function removeAll(array: unknown[], pointer: string, beginIndex: number, endInd
     const ret: DiffOperator[] = [];
     for (let i = endIndex - 1; i >= beginIndex; i--) {
         ret.push({
-            operator: "remove",
-            pointer: pointerAdd(pointer, String(i + shiftOnPointer)),
+            op: "remove",
+            path: phelper.append(pointer, String(i + shiftOnPointer)),
             ...(remember ? {oldValue: array[i]} : {})
         });
     }

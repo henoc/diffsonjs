@@ -53,10 +53,17 @@ describe("getLcs", () => {
         );
     });
 
-    it("returns a corret mapping with original equals function", () => {
+    it("returns a corret mapping with provided equals function", () => {
         assert.deepEqual(
             getLcs([1,2,3,4,5], [6,7,"a","b",8,9,10], (l,r) => typeof l === typeof r),
             [lr(0,0),lr(1,1),lr(2,4),lr(3,5),lr(4,6)]
+        );
+    });
+
+    it("returns a correct mapping with provided hashCode function", () => {
+        assert.deepEqual(
+            getLcs([1,2,3,4,5,6,7,8,9,10], [1,4,5,11,6,7], jsonEquals, v => Number(v) % 3),
+            [lr(0,0),lr(3,1),lr(4,2),lr(5,4),lr(6,5)]
         );
     });
 });

@@ -7,7 +7,7 @@ export function getLcs(left: unknown[], right: unknown[], equals: (left: unknown
     if (hashCode) {
         const leftHashTable = left.map(item => hashCode(item));
         const rightHashTable = right.map(item => hashCode(item));
-        eq = (i: number, j: number) => leftHashTable[i] === rightHashTable[j] ? true : equals(left[i], right[j]);
+        eq = (i: number, j: number) => leftHashTable[i] !== rightHashTable[j] ? false : equals(left[i], right[j]);
     }
     const N = 2;
     const M = right.length + 1;
