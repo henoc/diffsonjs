@@ -1,13 +1,14 @@
 {
   "name": "diffsonjs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A json diff/patch library",
   "main": "index.js",
   "scripts": {
     "compile": "tsc -p ./",
     "test": "mocha",
     "coverage": "nyc npm test",
-    "codecov": "nyc npm test && nyc report --reporter=text-lcov > coverage.lcov && ./node_modules/.bin/codecov"
+    "codecov": "nyc npm test && nyc report --reporter=text-lcov > coverage.lcov && ./node_modules/.bin/codecov",
+    "prepublish": "npm run compile"
   },
   "keywords": [
     "json",
