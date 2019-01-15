@@ -1,7 +1,7 @@
 {
   "name": "diffsonjs",
-  "version": "1.0.0",
-  "description": "RFC-6902 implementation",
+  "version": "0.1.0",
+  "description": "A json diff/patch library",
   "main": "index.js",
   "scripts": {
     "compile": "tsc -p ./",
