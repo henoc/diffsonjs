@@ -6,19 +6,25 @@
   "scripts": {
     "compile": "tsc -p ./",
     "test": "mocha",
-    "coverage": "nyc mocha --timeout=3000"
+    "coverage": "nyc npm test",
+    "codecov": "nyc npm test && nyc report --reporter=text-lcov > coverage.lcov && ./node_modules/.bin/codecov"
   },
   "keywords": [
     "json",
     "diff",
     "patch"
   ],
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/henoc/diffsonjs.git"
+  },
   "author": "henoc",
   "license": "MIT",
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.5",
     "chai": "^4.2.0",
+    "codecov": "^3.1.0",
     "mocha": "^5.2.0",
     "nyc": "^13.1.0",
     "typescript": "^3.2.2"
