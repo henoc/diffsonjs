@@ -4,12 +4,7 @@
     "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
-    "sourceMap": true,
-    "plugins": [
-      {
-        "name": "@fimbul/mithotyn"
-      }
-    ]
+    "sourceMap": true
   },
   "exclude": [
     "node_modules"
